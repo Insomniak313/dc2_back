@@ -1,11 +1,28 @@
 <?php
 
 /**
+ * Interface InterfaceIncrement
+ * Une interface est similaire à une classe 100% abstraite
+ * Celà permet de définir des patrons de conceptions uniquement pour la partie "comportement"
+ * Une classe PEUT IMPLEMENTER PLUSIEURS INTERFACES
+ */
+interface InterfaceIncrement {
+    /**
+     * Fonction abstraite : ici le comportement de la fonction n'est pas défini
+     * En faisant celà on oblige pour pouvour utiliser la classe qui va implémenter l'interface à définir cette fonction.
+     * Ici on va faire plus compliqué pour bien comprendre ce qui se passe, on ne va pas la définir directement dans la
+     * classe ClasseDeBase, on va la laisser abstraite et on définira cette méthode dans les classes enfants
+     * @return int
+     */
+    public function obtenir_increment();
+}
+
+/**
  * Class ClasseDeBase
  * Cette classe représente notre classe de "base"
  * Une de ses méthodes est abstraite (obtenir_increment) on doit donc également définir la classe comme "abstract"
  */
-abstract class ClasseDeBase
+abstract class ClasseDeBase implements InterfaceIncrement
 {
     /**
      * @var $proprietePrivate int
@@ -54,12 +71,8 @@ abstract class ClasseDeBase
         echo $this->proprietePrivate;
     }
 
-    /**
-     * Fonction abstraite : ici le comportement de la fonction n'est pas défini
-     * En faisant celà on oblige pour pouvour utiliser la classe ClasseDeBase à l'étendre et à définir cette fonction
-     * @return int
-     */
-    abstract public function obtenir_increment();
+
+
 }
 
 /**
@@ -69,6 +82,8 @@ abstract class ClasseDeBase
  * méthodes de la classe parente
  * Attention, lorsqu'on surcharge une méthode, sa définition (ie le nombre et le type des paramètres) doit être le même
  * que dans la classe parente
+ *
+ * Une classe NE PEUT PAS ETENDRE PLUSIEURS CLASSES
  */
 class ClasseEntendueIncrement1 extends ClasseDeBase
 {
