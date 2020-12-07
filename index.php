@@ -1,76 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-
-<style>
-    body {
-        background-color: <?php
-function rand_color() {
-    return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
-}
-
-echo rand_color();
-?>;
-    }
-
-</style>
-
-<ul>
 <?php
 
-// LEVE UN WARNING SI LE FICHIER N'EXISTE PAS
-include 'entete.php';
-include_once 'entete.php';
 
+class Application {
 
-// LEVE UNE ERREUR FATAL SI LE FICHIER N'EXISTE PAS
-require 'entete.php';
-require_once 'entete.php';
-
-class Test {
-    private $titre;
-    private $contenu;
-    private $contenuAutre;
-
-    public function __construct($titre, $contenu)
-    {
-        $this->titre = $titre;
-        $this->contenu = $contenu;
-    }
-
-    public function setContenuAutre($contenuAutre) {
-        $this->contenuAutre = $contenuAutre;
-    }
-
-    public function afficher() {
-        echo $this->titre . '<br/>' . $this->contenu . '<br/>' . $this->contenuAutre;
-    }
-
-    public function afficherSeparateur() {
-        echo '<hr/>';
+    public function lancer() {
+        $routeur = new Routeur();
+        $routeur->trouveRoute($_GET['p']);
     }
 }
 
-$test = new Test('titre', 'contenu');
-$test->afficher();
-$test->afficherSeparateur();
-$test->setContenuAutre('contenuAutre');
-$test->afficher();
+class Routeur {
+    public function trouveRoute($url) {
+        $rootControleur = new RootControleur();
+        switch ($url) {
+            case 'home':
+                $controleur = new HomeControleur();
+                $contenu = $controleur->index();
+                break;
 
-$variable = 'toto';
-$toto = 8;
+            case 'about':
+                $controleur = new AboutControleur();
+                $contenu = $controleur->index();
+                break;
 
-$$variable = 12;
+            default:
+                $controleur = new ErrorControleur();
+                $contenu = $controleur->index();
+                break;
+        }
 
-// $toto = 12
-
-for($i=0;$i<10;$i++) {
-    echo '<li>' . $i . '</li>';
+        $rootControleur->afficherPage($contenu);
+    }
 }
-?>
-</ul>
+
+class RootControleur {
+    public function afficherPage($contenu) {
+        echo '<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>' . $contenu . '
 </body>
-</html>
+</html>';
+    }
+}
+
+class HomeControleur {
+    public function index() {
+        return '<div>HOME</div>';
+    }
+}
+
+
+class AboutControleur {
+    public function index() {
+        return '<div>ABOUT</div>';
+    }
+}
+
+
+class ErrorControleur {
+    public function index() {
+        return '<div>ERROR</div>';
+    }
+}
+
+$app = new Application();
+$app->lancer();
+
