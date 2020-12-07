@@ -1,107 +1,123 @@
 <?php
 
-
 /**
- * Class Application
- * Classe permettant de récupérer le paramètre "p" dans l'URL et
- * d'aiguiller vers la bonne application
+ * Class ClasseDeBase
+ * Cette classe représente notre classe de "base"
+ * Une de ses méthodes est abstraite (obtenir_increment) on doit donc également définir la classe comme "abstract"
  */
-class Application {
+abstract class ClasseDeBase
+{
+    /**
+     * @var $proprietePrivate int
+     * Une propriété privée de notre objet : elle est accessible qu'au sein de ClasseDeBase
+     */
+    private $proprietePrivate;
 
     /**
-     * Fonction principale de notre application
+     * @var $proprieteProtected int
+     * Une propriété protected de notre objet : elle est accessible au sein de notre classe
+     * ClasseDeBase mais aussi au sein des classes qui vont étendre ClasseDeBase
      */
-    public function lancer() {
-        $routeur = new Routeur();
-        $routeur->trouveRoute($_GET['p']);
-    }
-}
-
-/**
- * Class Routeur
- * Classe permettant d'afficher la bonne page (texte affiché par une fonction d'une classe)
- * en fonction d'une url
- */
-class Routeur {
+    protected $proprieteProtected;
 
     /**
-     * Fonction permettant d'afficher la bonne page en fonction d'une URL
-     * @param $url
+     * @var $proprietePublic int
+     * Une propriété public de notre objet : elle accessible de partout
      */
-    public function trouveRoute($url) {
-        // En fonction de l'URL on va récupérer le contenu dans un controleur ou un autre
-        switch ($url) {
-            case 'home':
-                $controleur = new HomeControleur();
-                $contenu = $controleur->index();
-                break;
+    public $proprietePublic;
 
-            case 'about':
-                $controleur = new AboutControleur();
-                $contenu = $controleur->index();
-                break;
+    /**
+     * Constructeur
+     * Représente la fonction "new"
+     * On peut initialiser des variables de notre objet
+     */
+    public function __construct($prop_1, $prop_2)
+    {
+        $this->proprietePrivate = $prop_1;
+        $this->proprieteProtected = $prop_2;
+        $this->proprietePublic = 'valeur par défaut';
+    }
 
-            default:
-                $controleur = new ErrorControleur();
-                $contenu = $controleur->index();
-                break;
-        }
+    /**
+     * Méthode publique permettant d'incrémenter (ajouter un entier à) la propriété  proprietePrivate
+     * L'incrément est récupéré grâce à la fonction obtenir_increment
+     */
+    public function incrementer()
+    {
+        $this->proprietePrivate = $this->proprietePrivate + $this->obtenir_increment();
+    }
 
-        // Ensuite on affiche (echo) la page avec son contenu
-        $rootControleur = new RootControleur();
-        $rootControleur->afficherPage($contenu);
+    /**
+     * Méthode publique permettant d'afficher la propriété "proprietePrivate"
+     */
+    public function afficherProprietePrivate() {
+        echo $this->proprietePrivate;
+    }
+
+    /**
+     * Fonction abstraite : ici le comportement de la fonction n'est pas défini
+     * En faisant celà on oblige pour pouvour utiliser la classe ClasseDeBase à l'étendre et à définir cette fonction
+     * @return int
+     */
+    abstract public function obtenir_increment();
+}
+
+/**
+ * Class ClasseEntendueIncrement1
+ * Une classe étendant la classe ClasseDeBase
+ * Elle "hérite" du comportement de ClasseDeBase, mais on peut ajouter de nouvelles méthodes ou encore surcharger les
+ * méthodes de la classe parente
+ * Attention, lorsqu'on surcharge une méthode, sa définition (ie le nombre et le type des paramètres) doit être le même
+ * que dans la classe parente
+ */
+class ClasseEntendueIncrement1 extends ClasseDeBase
+{
+    /**
+     * Ici on définit vraiment ce que fait la fonction obtenir_increment, elle retourne 1
+     * @return int
+     */
+    public function obtenir_increment()
+    {
+        // $this->proprietePrivate = 1; ERREUR => la propriété n'est accessible que dans ClasseDeBase
+        // $this->proprieteProtected = 1; OK
+        // $this->proprietePublic = 1; OK
+        return 1;
     }
 }
 
 /**
- * Class RootControleur
- * Notre template de page principal, qui va inclure les autres
+ * Class ClasseEntendueIncrement2
+ * Idem que ClasseEntendueIncrement1 sauf que l'increment vaut ici 2
  */
-class RootControleur {
-    public function afficherPage($contenu) {
-        echo '<!DOCTYPE html>
-<html>
-<head>
-	<title></title>
-</head>
-<body>' . $contenu . '
-</body>
-</html>';
+class ClasseEntendueIncrement2 extends ClasseDeBase
+{
+    /**
+     * Ici on définit vraiment ce que fait la fonction obtenir_increment, elle retourne 2
+     * @return int
+     */
+    public function obtenir_increment()
+    {
+        return 2;
     }
 }
 
-/**
- * Class HomeControleur
- * Page d'accueil
- */
-class HomeControleur {
-    public function index() {
-        return '<div>HOME</div>';
-    }
-}
 
-/**
- * Class AboutControleur
- * Page a propos
- */
-class AboutControleur {
-    public function index() {
-        return '<div>ABOUT</div>';
-    }
-}
+// $a = new ClasseDeBase(0, 0);
+// => ERREUR ! On ne peut pas instancier de classe abstraite
 
-/**
- * Class ErrorControleur
- * Page d'erreur
- */
-class ErrorControleur {
-    public function index() {
-        return '<div>ERROR</div>';
-    }
-}
+$b = new ClasseEntendueIncrement1(0, 0);
+echo 'ClasseEntendueIncrement1<br/>Valeur avant increment : ';
+$b->afficherProprietePrivate();
+$b->incrementer();
+echo '<br/>Valeur après increment : ';
+$b->afficherProprietePrivate();
+echo '<br/><hr/><br/>';
 
-// On instancie l'application (on crée un nouvel objet de type Application)
-$app = new Application();
-// Et on lance l'app
-$app->lancer();
 
+$c = new ClasseEntendueIncrement2(0, 0);
+echo 'ClasseEntendueIncrement2<br/>Valeur avant increment : ';
+$c->afficherProprietePrivate();
+$c->incrementer();
+echo '<br/>Valeur après increment : ';
+$c->afficherProprietePrivate();
+echo '<br/>';
