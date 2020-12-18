@@ -244,9 +244,10 @@ titre		VARCHAR(50)
 couleur		VARCHAR(7)
 
 
-Si je veux récupérer le nombre d'article par titre de catégorie, je fais :
+Si je veux récupérer le nombre d'article par titre de catégorie triées de manière alphabétique, je fais :
 
 SELECT c.titre, COUNT(*)
 FROM article a, categorie c
 WHERE a.categorie_id = c.id
-GROUP BY c.id
+GROUP BY c.titre
+ORDER BY c.titre ASC
